@@ -1,5 +1,6 @@
 import plotly.offline as pyo
 import plotly.graph_objs as go
+import plotly.io as io
 from db import engine
 import plotly.io as pio
 pio.templates
@@ -68,9 +69,10 @@ class Plot(object):
         return self
         
 
-    def generate_div_plot(self):
-        return pyo.plot(self.fig, output_type='div', include_plotlyjs=False)
-    
+    def generate_json_plot(self):
+        #return pyo.plot(self.fig, output_type='div', include_plotlyjs=False)
+        #return pyo.plot(self.fig,include_plotlyjs="cdn", output_type="div")
+        return io.to_json(self.fig)
     def generate_html_plot(self):
         return pyo.plot(self.fig)
           
@@ -82,8 +84,8 @@ if __name__ == "__main__":
     df = pd.read_sql_table(data_filter, engine)
     print(df)
     #plot = Plot(df).line_time_index_base_100().generate_html_plot()
-    Plot(df).line_time_index_base_100().generate_html_plot()
-    #print(Plot(df).line_time_index_base_100().generate_div_plot())
+    #Plot(df).line_time_index_base_100().generate_html_plot()
+    print(Plot(df).line_time_index_base_100().generate_json_plot())
     
 
 

@@ -22,21 +22,27 @@
                         <input type="text" class="form-control" placeholder="agency_id">
                         </div>
                         <div class="col">
-                        <input type="text" class="form-control" placeholder="agency_id">
+                        <input type="text" class="form-control" placeholder="dataset_id">
                         </div>
                     </div>
                     </form>
             </div>
+            <div class="row" id="button"></div>
+                <button class="btn btn-primary" id="select_dataset">
+                    Select agency and dataset
+                </button>
+            </div>
+
             <div class="row" id="filter">
             </div>
             
-            <div class="row" id="plot"></div>
+            <div class="row" id="button"></div>
                 <button class="btn btn-primary" id="execute_filter">
                     Generate Plot
                 </button>
             </div>
             <div class="row" id="plot">
-                <div class ="col">1</div>
+                
             </div>
         </div>
     </body>
@@ -52,6 +58,8 @@ fetch(url)
   variable_code_label = data;
   }).then(function(data){
         let filter_Data = render_menu_variable_code_label(variable_code_label);
+        const execute = document.getElementById("execute_filter");
+        execute.addEventListener("click", function() {get_values_from_select_battery(variable_code_label)});
         }
       )
 
@@ -112,18 +120,46 @@ function render_menu_variable_code_label(variable_code_label) {
     }
 
 function get_values_from_select_battery(variable_code_label) {
-    let filter = {};
+    var filter_obj = {};
     for (const key in variable_code_label) {
             console.log(`"------${key}-------"`);
             let value = document.getElementsByName(key)[0].value;
-            filter[key] = value;}
+            if (value != "auto")
+            {filter_obj[key] = value;}
+        }
     
-    console.log(filter)
-    return filter   
+    console.log(filter_obj)
+        
+    
+    retrive_plot(filter_obj)
+    
+    return filter_obj   
+}
+
+var payloadD = null;
+function retrive_plot(filter_obj) {
+let data = filter_obj;
+
+
+
+fetch('http://127.0.0.1:5000/ESTAT/une_rt_m/filter/line', {
+  method: "POST",
+  body: JSON.stringify(data),
+  headers: {"Content-type": "application/json; charset=UTF-8"}
+})
+.then(response => response.json()) 
+.then(function(json) {
+    
+    payloadD = JSON.parse(json);
+    DIV_LINE = document.getElementById('plot');
+	Plotly.newPlot( DIV_LINE, payloadD);
+    
+    return payloadD;})
+.catch(err => console.log(err));
 }
 
 
-window.addEventListener('load',function(){
+/* window.addEventListener('load',function(){
     //
     //
     alert("ciao")
@@ -142,7 +178,7 @@ function checkVariable()
    }
 }
 
-checkVariable();
+checkVariable(); */
 
 
 </script>
