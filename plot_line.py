@@ -3,6 +3,7 @@ import plotly.graph_objs as go
 import plotly.io as io
 from db import engine
 import plotly.io as pio
+import plotly.express as px
 pio.templates
 
 
@@ -67,7 +68,21 @@ class Plot(object):
         self.fig = go.Figure(data=data, layout= layout) 
         
         return self
-        
+
+    def bar(self):
+        self.min = self.dataset["value"].min()
+        self.max = self.dataset["value"].max()
+        self.dataset.sort_values("value", inplace = True)
+
+        self.fig = px.bar(self.dataset,
+         x="GEO",
+         y="value",
+         animation_frame="TIME_PERIOD",
+         color="GEO", 
+         color_discrete_sequence=px.colors.qualitative.Dark24,
+         )
+         
+        return self
 
     def generate_json_plot(self):
         #return pyo.plot(self.fig, output_type='div', include_plotlyjs=False)
@@ -85,7 +100,7 @@ if __name__ == "__main__":
     print(df)
     #plot = Plot(df).line_time_index_base_100().generate_html_plot()
     #Plot(df).line_time_index_base_100().generate_html_plot()
-    print(Plot(df).line_time_index_base_100().generate_json_plot())
-    
+    #print(Plot(df).line_time_index_base_100().generate_json_plot())
+    print(Plot(df).bar().generate_html_plot())
 
 

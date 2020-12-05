@@ -19,16 +19,16 @@
                 <form>
                     <div class="form-row">
                         <div class="col">
-                        <input type="text" class="form-control" placeholder="agency_id">
+                        <input type="text" class="form-control" placeholder="agency_id" id="agency_id">
                         </div>
                         <div class="col">
-                        <input type="text" class="form-control" placeholder="dataset_id">
+                        <input type="text" class="form-control" placeholder="dataset_id" id="dataset_id">
                         </div>
                     </div>
                     </form>
             </div>
-            <div class="row" id="button"></div>
-                <button class="btn btn-primary" id="select_dataset">
+            <div class="row" id="button">
+                <button class="btn btn-primary" id="select_DSD">
                     Select agency and dataset
                 </button>
             </div>
@@ -36,7 +36,7 @@
             <div class="row" id="filter">
             </div>
             
-            <div class="row" id="button"></div>
+            <div class="row" id="button">
                 <button class="btn btn-primary" id="execute_filter">
                     Generate Plot
                 </button>
@@ -50,73 +50,86 @@
 
 
 <script>
+//global variable - need to refactor
+    
 var variable_code_label = null 
-var url = 'http://127.0.0.1:5000/ESTAT/une_rt_m';
-fetch(url)
-.then((resp) => resp.json()) // Transform the data into json
-.then(function(data) {
-  variable_code_label = data;
-  }).then(function(data){
-        let filter_Data = render_menu_variable_code_label(variable_code_label);
-        const execute = document.getElementById("execute_filter");
-        execute.addEventListener("click", function() {get_values_from_select_battery(variable_code_label)});
-        }
-      )
+var agency_id = null;
+var dataset_id = null;
+var url = null; 
+const select_DSD = document.getElementById("select_DSD");
+select_DSD.addEventListener("click", function() {DSD_fetch();}) 
 
-function create_cards(title, elements) {
-    
-    let content = "";
-    for (const [key2, value2] of Object.entries(elements)) {
-        if (key2 != "auto") {
-            var select = `<option value="${key2}"><b>${key2}</b>: ${value2}</option>`;
-        } else {
-            var select = `<option value="${key2}" selected><b>${key2}</b>: ${value2}</option>`;
-        }
+
+    function DSD_fetch(){
+        agency_id = document.getElementById("agency_id").value;
+        dataset_id = document.getElementById("dataset_id").value;    
+        url = `http://127.0.0.1:5000/${agency_id}/${dataset_id}`;
+        fetch(url)
+        .then((resp) => resp.json()) // Transform the data into json
+        .then(function(data) {
+        variable_code_label = data;
+        }).then(function(data){
+                let filter_Data = render_menu_variable_code_label(variable_code_label);
+                const execute = document.getElementById("execute_filter");
+                execute.addEventListener("click", function() {get_values_from_select_battery(variable_code_label)});
+                }
+            )
+
+    function create_cards(title, elements) {
         
-        content = content + select
-    }
+        let content = "";
+        for (const [key2, value2] of Object.entries(elements)) {
+            if (key2 != "auto") {
+                var select = `<option value="${key2}"><b>${key2}</b>: ${value2}</option>`;
+            } else {
+                var select = `<option value="${key2}" selected><b>${key2}</b>: ${value2}</option>`;
+            }
+            
+            content = content + select
+        }
 
-    let text = `
-    
-    <div class="card w-50">
-            <div class="card-header">
-                ${title}
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="exampleFormControlSelect1">Example select</label>
-                    <select class="form-control" id="exampleFormControlSelect1" name="${title}">
-                        ${content}
-                    </select>
+        let text = `
+        
+        <div class="card w-50">
+                <div class="card-header">
+                    ${title}
                 </div>
-                
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">${title}/label>
+                        <select class="form-control" id="exampleFormControlSelect1" name="${title}">
+                            ${content}
+                        </select>
+                    </div>
+                    
+                </div>
             </div>
-        </div>
-       
-    `
+        
+        `
 
-    return text
-
-
-}
+        return text
 
 
-function render_menu_variable_code_label(variable_code_label) {
-    variable_code_label_dict = Object.entries(variable_code_label)
-    let filter_text = "";
-    for (const [key, value] of variable_code_label_dict) {
-        console.log(`"------${key}-------"`);
-        console.log(create_cards(key, value));
-        filter_text = filter_text + create_cards(key, value);
-
-        //console.log(`${key}: ${value}`);
-        //for (const [key2, value2] of Object.entries(value)) {
-        //console.log(`${key2}: ${value2}`);
     }
-    console.log(filter_text)
-    let filter_div = document.getElementById("filter");
-    filter_div.innerHTML = filter_text;
-    return filter_text
+
+
+    function render_menu_variable_code_label(variable_code_label) {
+        variable_code_label_dict = Object.entries(variable_code_label)
+        let filter_text = "";
+        for (const [key, value] of variable_code_label_dict) {
+            console.log(`"------${key}-------"`);
+            console.log(create_cards(key, value));
+            filter_text = filter_text + create_cards(key, value);
+
+            //console.log(`${key}: ${value}`);
+            //for (const [key2, value2] of Object.entries(value)) {
+            //console.log(`${key2}: ${value2}`);
+        }
+        console.log(filter_text)
+        let filter_div = document.getElementById("filter");
+        filter_div.innerHTML = filter_text;
+        return filter_text
+        }
     }
 
 function get_values_from_select_battery(variable_code_label) {
@@ -127,36 +140,29 @@ function get_values_from_select_battery(variable_code_label) {
             if (value != "auto")
             {filter_obj[key] = value;}
         }
-    
-    console.log(filter_obj)
-        
-    
-    retrive_plot(filter_obj)
-    
+    console.log(filter_obj);
+    retrive_plot(filter_obj);
     return filter_obj   
 }
 
 var payloadD = null;
 function retrive_plot(filter_obj) {
-let data = filter_obj;
-
-
-
-fetch('http://127.0.0.1:5000/ESTAT/une_rt_m/filter/line', {
-  method: "POST",
-  body: JSON.stringify(data),
-  headers: {"Content-type": "application/json; charset=UTF-8"}
-})
-.then(response => response.json()) 
-.then(function(json) {
-    
-    payloadD = JSON.parse(json);
-    DIV_LINE = document.getElementById('plot');
-	Plotly.newPlot( DIV_LINE, payloadD);
-    
-    return payloadD;})
-.catch(err => console.log(err));
-}
+    let data = filter_obj;
+    fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/line`, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    .then(response => response.json()) 
+    .then(function(json) {
+        
+        payloadD = JSON.parse(json);
+        DIV_LINE = document.getElementById('plot');
+        Plotly.newPlot( DIV_LINE, payloadD);
+        
+        return payloadD;})
+    .catch(err => console.log(err));
+    }
 
 
 /* window.addEventListener('load',function(){
