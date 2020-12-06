@@ -16,33 +16,95 @@
     <body>
         <div class="container">
             <div class="row"id="init">
-                <form>
-                    <div class="form-row">
-                        <div class="col">
-                        <input type="text" class="form-control" placeholder="agency_id" id="agency_id">
+                <div class="card">
+                    <div class="card-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="col">
+                            <input type="text" class="form-control" placeholder="agency_id" id="agency_id" value="ESTAT">
+                            </div>
+                            <div class="col">
+                            <input type="text" class="form-control" placeholder="dataset_id" id="dataset_id" value="tps00046">
+                            </div>
                         </div>
-                        <div class="col">
-                        <input type="text" class="form-control" placeholder="dataset_id" id="dataset_id">
-                        </div>
+                        </form>
                     </div>
-                    </form>
+                </div>
             </div>
             <div class="row" id="button">
-                <button class="btn btn-primary" id="select_DSD">
-                    Select agency and dataset
-                </button>
+                <div class="card">
+                    <div class="card-body">
+                        <button class="btn btn-primary" id="select_DSD">
+                            Select agency and dataset
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="row" id="filter">
             </div>
             
             <div class="row" id="button">
-                <button class="btn btn-primary" id="execute_filter">
-                    Generate Plot
-                </button>
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <button class="btn btn-primary" id="execute_filter">
+                                Generate all plots
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <button class="btn btn-primary" id="execute_filter_line">
+                                Generate line
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <button class="btn btn-primary" id="execute_filter_bar">
+                                Generate bar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <button class="btn btn-primary" id="execute_filter_map">
+                                Generate map
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="row" id="plot">
-                
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Line</h5>
+                    <div class="row" id="line_plot">
+                </div>
+            </div>
+
+
+            </div>
+            <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title">Bar</h5>
+                    <div class="row" id="bar_plot">
+                    </div>
+                </div>
+            </div>
+            
+                <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Choroplete</h5>
+                      <div class="row" id="map_plot" style="height:800px;">
+                    </div>
+                  </div>
             </div>
         </div>
     </body>
@@ -72,6 +134,12 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
                 let filter_Data = render_menu_variable_code_label(variable_code_label);
                 const execute = document.getElementById("execute_filter");
                 execute.addEventListener("click", function() {get_values_from_select_battery(variable_code_label)});
+                const execute_line = document.getElementById("execute_filter_line");
+                execute_line.addEventListener("click", function() {get_values_from_select_battery_line(variable_code_label)});
+                const execute_bar = document.getElementById("execute_filter_bar");
+                execute_bar.addEventListener("click", function() {get_values_from_select_battery_bar(variable_code_label)});
+                const execute_map = document.getElementById("execute_filter_map");
+                execute_map.addEventListener("click", function() {get_values_from_select_battery_map(variable_code_label)});
                 }
             )
 
@@ -117,15 +185,22 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
         variable_code_label_dict = Object.entries(variable_code_label)
         let filter_text = "";
         for (const [key, value] of variable_code_label_dict) {
-            console.log(`"------${key}-------"`);
-            console.log(create_cards(key, value));
+            //console.log(`"------${key}-------"`);
+            //console.log(create_cards(key, value));
             filter_text = filter_text + create_cards(key, value);
 
             //console.log(`${key}: ${value}`);
             //for (const [key2, value2] of Object.entries(value)) {
             //console.log(`${key2}: ${value2}`);
         }
-        console.log(filter_text)
+        //console.log(filter_text)
+
+        var years = {};
+        var now = new Date().getFullYear()
+        for (var i = 1970; i <= now; i++) {
+            years[i] = i;
+        }
+        filter_text = filter_text + create_cards('startPeriod', years);
         let filter_div = document.getElementById("filter");
         filter_div.innerHTML = filter_text;
         return filter_text
@@ -140,30 +215,135 @@ function get_values_from_select_battery(variable_code_label) {
             if (value != "auto")
             {filter_obj[key] = value;}
         }
-    console.log(filter_obj);
-    retrive_plot(filter_obj);
+    //console.log(filter_obj);
+    retrive_line_plot(filter_obj);
+    retrive_bar_plot(filter_obj);
+    retrive_map_plot(filter_obj);
     return filter_obj   
 }
 
+function filter_obj_in_variable_code_label(variable_code_label){
+    var filter_obj = {};
+    for (const key in variable_code_label) {
+            console.log(`"------${key}-------"`);
+            let value = document.getElementsByName(key)[0].value;
+            if (value != "auto")
+            {filter_obj[key] = value;}
+        }
+    //let value = document.getElementsByName('startPeriod')[0].value;
+    //filter_obj['startPeriod'] = value;
+    return filter_obj
+
+}
+
+function filter_startPeriod(variable_code_label){
+    let startPeriod = document.getElementsByName('startPeriod')[0].value;
+    return {"startPeriod": startPeriod}
+}
+
+
+function get_values_from_select_battery_line(variable_code_label) {
+    let filter_obj = filter_obj_in_variable_code_label(variable_code_label);
+    let startPeriod = filter_startPeriod(variable_code_label);
+    
+    console.log(filter_obj);
+    console.log(startPeriod);
+    retrive_line_plot(filter_obj, startPeriod);
+    //retrive_bar_plot(filter_obj);
+    //retrive_map_plot(filter_obj);
+    return filter_obj   
+}
+
+function get_values_from_select_battery_bar(variable_code_label) {
+    let filter_obj = filter_obj_in_variable_code_label(variable_code_label);
+    let startPeriod = filter_startPeriod(variable_code_label);
+    
+    console.log(filter_obj);
+    console.log(startPeriod);
+    retrive_bar_plot(filter_obj, startPeriod);
+    return filter_obj    
+}
+
+function get_values_from_select_battery_map(variable_code_label) {
+    let filter_obj = filter_obj_in_variable_code_label(variable_code_label);
+    let startPeriod = filter_startPeriod(variable_code_label);
+    console.log(filter_obj);
+    console.log(startPeriod);
+    //console.log(filter_obj);
+    //retrive_line_plot(filter_obj);
+    //retrive_bar_plot(filter_obj);
+    DIV_LINE = document.getElementById('map_plot');
+    DIV_LINE.innerHTML = `
+        <div id="placeholder_map" class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        </div>
+        `;
+    retrive_map_plot(filter_obj, startPeriod);
+    return filter_obj   
+}
+
+
 var payloadD = null;
-function retrive_plot(filter_obj) {
+function retrive_line_plot(filter_obj, startPeriod) {
     let data = filter_obj;
+    let year = startPeriod;
     fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/line`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify({"data": data, "startPeriod": year}),
     headers: {"Content-type": "application/json; charset=UTF-8"}
     })
     .then(response => response.json()) 
     .then(function(json) {
         
         payloadD = JSON.parse(json);
-        DIV_LINE = document.getElementById('plot');
+        DIV_LINE = document.getElementById('line_plot');
         Plotly.newPlot( DIV_LINE, payloadD);
         
         return payloadD;})
     .catch(err => console.log(err));
     }
 
+
+function retrive_bar_plot(filter_obj, startPeriod) {
+    let data = filter_obj;
+    let year = startPeriod;
+    fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/bar`, {
+    method: "POST",
+    body: JSON.stringify({"data": data, "startPeriod": year}),
+    headers: {"Content-type": "application/json; charset=UTF-8"}
+    })
+    .then(response => response.json()) 
+    .then(function(json) {
+        
+        payloadD = JSON.parse(json);
+        DIV_LINE = document.getElementById('bar_plot');
+        Plotly.newPlot( DIV_LINE, payloadD);
+        
+        return payloadD;})
+    .catch(err => console.log(err));
+    }
+
+function retrive_map_plot(filter_obj, startPeriod) {
+let data = filter_obj;
+let year = startPeriod;
+fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/map`, {
+method: "POST",
+body: JSON.stringify({"data": data, "startPeriod": year}),
+headers: {"Content-type": "application/json; charset=UTF-8"}
+}).then(response => response.json()) 
+.then(function(json) {
+    payloadD = JSON.parse(json);
+    DIV_LINE = document.getElementById('map_plot');
+    Plotly.newPlot( DIV_LINE, payloadD).then(function() { 
+    placeholder_map = document.getElementById('placeholder_map');
+    placeholder_map.remove();
+    }).catch(err => console.log(err));
+    
+    return payloadD;})
+.catch(err => console.log(err));
+}
 
 /* window.addEventListener('load',function(){
     //

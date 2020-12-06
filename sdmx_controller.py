@@ -25,7 +25,7 @@ def return_line_plot_json(agency_id, dataset_id):
     print(type(payload))
     try:
         sdmx = Sdmx_connector(agency_id, dataset_id)
-        dataset = sdmx.get_filtered_data(key=payload)
+        dataset = sdmx.get_filtered_data(key=payload["data"], params=payload["startPeriod"])
         sdmx.save_filtered_data()
         return jsonify(Plot(dataset).line_time_index_base_100().generate_json_plot())
 
@@ -39,7 +39,7 @@ def return_bar_plot_json(agency_id, dataset_id):
     print(type(payload))
     try:
         sdmx = Sdmx_connector(agency_id, dataset_id)
-        dataset = sdmx.get_filtered_data(key=payload)
+        dataset = sdmx.get_filtered_data(key=payload["data"], params=payload["startPeriod"])
         sdmx.save_filtered_data()
         return jsonify(Plot(dataset).bar().generate_json_plot())
 
@@ -53,7 +53,7 @@ def return_map_plot_json(agency_id, dataset_id):
     print(type(payload))
     try:
         sdmx = Sdmx_connector(agency_id, dataset_id)
-        dataset = sdmx.get_filtered_data(key=payload)
+        dataset = sdmx.get_filtered_data(key=payload["data"], params=payload["startPeriod"])
         sdmx.save_filtered_data()
         return jsonify(Choroplete(dataset).load_shape().apply_eurostat().generate_fig().generate_html_map().generate_json_plot())
 
