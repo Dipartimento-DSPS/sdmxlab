@@ -2,9 +2,11 @@ import plotly.offline as pyo
 import plotly.graph_objs as go
 import plotly.io as io
 from db import engine
-import plotly.io as pio
+
 import plotly.express as px
-pio.templates
+io.templates
+import pandas as pd
+pd.set_option('mode.chained_assignment', None)
 
 
 class Plot(object):
@@ -40,7 +42,7 @@ class Plot(object):
             temporary_data = dataset_filtered.dropna()
             first_series_time = temporary_data["TIME_PERIOD"].min()
             first_series_value = temporary_data[temporary_data["TIME_PERIOD"] == first_series_time]["value"].values[0]
-            temporary_data["value"] = temporary_data["value"].apply(lambda x: x / first_series_value * 100)
+            temporary_data.loc[:,"value"] = temporary_data["value"].apply(lambda x: x / first_series_value * 100)
             return temporary_data
         
         data =[]
@@ -72,7 +74,7 @@ class Plot(object):
     def bar(self):
         self.min = self.dataset["value"].min()
         self.max = self.dataset["value"].max()
-        self.dataset.sort_values("value", inplace = True)
+        #self.dataset.sort_values("value", inplace = True)
 
         self.fig = px.bar(self.dataset,
          x="GEO",
@@ -101,6 +103,6 @@ if __name__ == "__main__":
     #plot = Plot(df).line_time_index_base_100().generate_html_plot()
     #Plot(df).line_time_index_base_100().generate_html_plot()
     #print(Plot(df).line_time_index_base_100().generate_json_plot())
-    print(Plot(df).bar().generate_html_plot())
+    print(Plot(df).bar().generate_json_plot())
 
 

@@ -117,7 +117,7 @@ class Sdmx_connector(object):
         except UnboundLocalError:
             return {"Error": "Error during download, please reduce the number of variables by using the filter function."}
 
-    def get_filtered_data(self, key, params = {'startPeriod': '1970'}):
+    def get_filtered_data(self, key, params = {'startPeriod': '2006'}):
         #key: {'GEO': ['EL', 'IT'], "SEX": ["M"]}
         #params: {'startPeriod': '2016', "endPeriod": "2016"}
         self.key = key

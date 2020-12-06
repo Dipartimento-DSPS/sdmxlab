@@ -4,14 +4,17 @@ import plotly.offline as pyo
 import plotly.graph_objs as go
 from db import engine
 import plotly.express as px
+import plotly.io as io
 
 class Choroplete():
-    def __init__(self, dataset, geojson_url):
+    def __init__(self, dataset, geojson_url = "static_map/NUTS_RG_20M_2021_4326.geojson"):
         self.df = dataset
         self.geojson = geojson_url
+        
     
     def load_shape(self):
         self.df_shape = geopandas.read_file(self.geojson)
+        return self
     
     def apply_eurostat(self):
         self.df.rename(columns = {"GEO": "NUTS_ID"}, inplace = True)
@@ -19,6 +22,7 @@ class Choroplete():
         self.df_geo.set_index("NUTS_NAME", inplace = True)
         self.min = self.df_geo["value"].min()
         self.max = self.df_geo["value"].max()
+        return self
 
 
     def generate_fig(self):
@@ -36,15 +40,22 @@ class Choroplete():
                    opacity=0.85
                    )
         self.fig.update_geos(fitbounds="locations", visible=False)
+        return self
     
     
     def generate_div_map(self):
         #for flask
         return pyo.plot(self.fig, output_type='div', include_plotlyjs=False)
+
+    def generate_json_plot(self):
+        #return pyo.plot(self.fig, output_type='div', include_plotlyjs=False)
+        #return pyo.plot(self.fig,include_plotlyjs="cdn", output_type="div")
+        return io.to_json(self.fig)
     
     def generate_html_map(self):
         #for testingS 
         pyo.plot(self.fig) 
+        return self
         
 
 
@@ -57,7 +68,7 @@ if __name__ == "__main__":
     map.load_shape()
     map.apply_eurostat()
     map.generate_fig() 
-    map.generate_html_map()
+    print(map.generate_json_plot())
 
 
 
