@@ -148,9 +148,9 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
         let content = "";
         for (const [key2, value2] of Object.entries(elements)) {
             if (key2 != "auto") {
-                var select = `<option value="${key2}"><b>${key2}</b>: ${value2}</option>`;
+                var select = `<option id="${title}:${value2}" value="${key2}"><b>${key2}</b>: ${value2}</option>`;
             } else {
-                var select = `<option value="${key2}" selected><b>${key2}</b>: ${value2}</option>`;
+                var select = `<option id"${title}:${value2}" value="${key2}" selected><b>${key2}</b>: ${value2}</option>`;
             }
             
             content = content + select
@@ -196,29 +196,34 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
         //console.log(filter_text)
 
         var years = {};
-        var now = new Date().getFullYear()
+        var years_inv = {};
+        var now = new Date().getFullYear();
         for (var i = 1970; i <= now; i++) {
             years[i] = i;
         }
+
+        var now = new Date().getFullYear()
+        for (var i = 1970; i <= now; i++) {
+            years_inv[i] = i;
+        }
+
+
         filter_text = filter_text + create_cards('startPeriod', years);
+        filter_text = filter_text + create_cards('endPeriod', years_inv);
         let filter_div = document.getElementById("filter");
         filter_div.innerHTML = filter_text;
+        document.getElementById(`endPeriod:${now}`).selected = true;
         return filter_text
         }
     }
 
 function get_values_from_select_battery(variable_code_label) {
-    var filter_obj = {};
-    for (const key in variable_code_label) {
-            console.log(`"------${key}-------"`);
-            let value = document.getElementsByName(key)[0].value;
-            if (value != "auto")
-            {filter_obj[key] = value;}
-        }
+    let filter_obj = filter_obj_in_variable_code_label(variable_code_label);
+    let startPeriod = filter_startPeriod(variable_code_label);
     //console.log(filter_obj);
-    retrive_line_plot(filter_obj);
-    retrive_bar_plot(filter_obj);
-    retrive_map_plot(filter_obj);
+    retrive_line_plot(filter_obj, startPeriod);
+    retrive_bar_plot(filter_obj, startPeriod);
+    retrive_map_plot(filter_obj, startPeriod);
     return filter_obj   
 }
 
@@ -238,7 +243,8 @@ function filter_obj_in_variable_code_label(variable_code_label){
 
 function filter_startPeriod(variable_code_label){
     let startPeriod = document.getElementsByName('startPeriod')[0].value;
-    return {"startPeriod": startPeriod}
+    let endPeriod = document.getElementsByName('endPeriod')[0].value;
+    return {"startPeriod": startPeriod, 'endPeriod':endPeriod}
 }
 
 
