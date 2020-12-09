@@ -125,7 +125,7 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
     function DSD_fetch(){
         agency_id = document.getElementById("agency_id").value;
         dataset_id = document.getElementById("dataset_id").value;    
-        url = `http://127.0.0.1:5000/${agency_id}/${dataset_id}`;
+        url = `http://localhost:5000/${agency_id}/${dataset_id}`;
         fetch(url)
         .then((resp) => resp.json()) // Transform the data into json
         .then(function(data) {
@@ -164,7 +164,7 @@ select_DSD.addEventListener("click", function() {DSD_fetch();})
                 </div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label for="exampleFormControlSelect1">${title}/label>
+                        <label for="exampleFormControlSelect1">${title}</label>
                         <select class="form-control" id="exampleFormControlSelect1" name="${title}">
                             ${content}
                         </select>
@@ -295,7 +295,7 @@ var payloadD = null;
 function retrive_line_plot(filter_obj, startPeriod) {
     let data = filter_obj;
     let year = startPeriod;
-    fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/line`, {
+    fetch(`http://localhost:5000/${agency_id}/${dataset_id}/filter/line`, {
     method: "POST",
     body: JSON.stringify({"data": data, "startPeriod": year}),
     headers: {"Content-type": "application/json; charset=UTF-8"}
@@ -315,7 +315,7 @@ function retrive_line_plot(filter_obj, startPeriod) {
 function retrive_bar_plot(filter_obj, startPeriod) {
     let data = filter_obj;
     let year = startPeriod;
-    fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/bar`, {
+    fetch(`http://localhost:5000/${agency_id}/${dataset_id}/filter/bar`, {
     method: "POST",
     body: JSON.stringify({"data": data, "startPeriod": year}),
     headers: {"Content-type": "application/json; charset=UTF-8"}
@@ -334,7 +334,7 @@ function retrive_bar_plot(filter_obj, startPeriod) {
 function retrive_map_plot(filter_obj, startPeriod) {
 let data = filter_obj;
 let year = startPeriod;
-fetch(`http://127.0.0.1:5000/${agency_id}/${dataset_id}/filter/map`, {
+fetch(`http://localhost:5000/${agency_id}/${dataset_id}/filter/map`, {
 method: "POST",
 body: JSON.stringify({"data": data, "startPeriod": year}),
 headers: {"Content-type": "application/json; charset=UTF-8"}
